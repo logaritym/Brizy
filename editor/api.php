@@ -325,17 +325,12 @@ class Brizy_Editor_API {
 				return;
 			}
 
-			wp_update_post( array( 'ID' => $post_id, 'post_content' => $post->get_compiled_html_body() ) );
-
 			$post_type        = $post->get_wp_post()->post_type;
 			$post_type_object = get_post_type_object( $post_type );
 			$can_publish      = current_user_can( $post_type_object->cap->publish_posts );
+			$post_status  = $can_publish ?'publish':'pending';
 
-			if ( $can_publish ) {
-				wp_publish_post( $post_id );
-			} else {
-				wp_update_post( array( 'ID' => $post_id, 'post_status' => 'pending' ) );
-			}
+			wp_update_post( array( 'ID' => $post_id, 'post_status' => $post_status , 'post_content' => $post->get_compiled_html_body() ) );
 
 			// get latest version of post
 			$post                 = Brizy_Editor_Post::get( $post_id );
@@ -444,7 +439,7 @@ class Brizy_Editor_API {
 	public function update_item() {
 		try {
 			$_POST = array_map( 'stripslashes_deep', $_POST );
-			$data  = $this->param( 'data' );
+			$data  = stripslashes($this->param( 'data' ));
 			//$title     = $this->param( 'title' );
 			$atemplate = $this->param( 'template' );
 

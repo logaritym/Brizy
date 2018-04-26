@@ -46,16 +46,6 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 	protected $needs_compile;
 
 	/**
-	 * @var bool
-	 */
-	//protected $store_assets;
-
-	/**
-	 * @var array
-	 */
-	//protected $assets = array();
-
-	/**
 	 * Json for the editor.
 	 *
 	 * @var string
@@ -119,8 +109,12 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 		if ( $apost instanceof WP_Post ) {
 			$wp_post_id = $apost->ID;
 		}
+		$type = get_post_type( $wp_post_id );
 
-		if ( ! in_array( ( $type = get_post_type( $wp_post_id ) ), brizy()->supported_post_types() ) ) {
+		$supported_post_types   = brizy()->supported_post_types();
+		$supported_post_types[] = 'revision';
+
+		if ( ! in_array( $type, $supported_post_types ) ) {
 			throw new Brizy_Editor_Exceptions_UnsupportedPostType(
 				"Brizy editor doesn't support '{$type}' post type 1"
 			);
@@ -177,12 +171,66 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 		}
 		Brizy_Logger::instance()->notice( 'Create post', array( $project, $post ) );
 
-		//$api_page_obj = Brizy_Editor_API_Page::get()->set_title( $post->post_title );
-		//$api_page     = Brizy_Editor_User::get()->create_page( $project, $api_page_obj );
-
 		$post = new self( $post->ID );
 
 		return $post;
+	}
+
+	public function save_revision( $revision_id ) {
+
+		update_metadata( 'post', $revision_id, self::BRIZY_POST_SIGNATURE_KEY, Brizy_Editor_Signature::get() );
+
+		if ( $this->get_api_page() ) {
+			update_metadata( 'post', $revision_id, self::BRIZY_POST_HASH_KEY, $this->get_api_page()->get_id() );
+		}
+
+		$storage       = Brizy_Editor_Storage_Post::instance( $revision_id );
+		$storage_value = $this->storage()->get_storage();
+
+		if ( count( $storage_value ) == 0 ) {
+			return;
+		}
+
+		$storage->loadStorage( $storage_value );
+	}
+
+	public function restore_from_revision( $revision_id ) {
+
+		$storage = Brizy_Editor_Storage_Post::instance( $revision_id );
+
+		/**
+		 * @var Brizy_Editor_Post $revision_storage
+		 */
+		$revision_storage = $storage->get_storage();
+
+		if ( !$revision_storage || count( $revision_storage ) == 0 ) {
+			return;
+		}
+
+		$this->storage()->loadStorage( $revision_storage );
+
+		$signature = get_metadata( 'post', $revision_id, self::BRIZY_POST_SIGNATURE_KEY, true );
+		if ( $signature ) {
+			update_post_meta( $this->get_parent_id(), self::BRIZY_POST_SIGNATURE_KEY, $signature );
+		}
+
+		$hash_key = get_metadata( 'post', $this->get_parent_id(), self::BRIZY_POST_HASH_KEY, true );
+
+		if ( $hash_key ) {
+			update_post_meta( $this->get_parent_id(), self::BRIZY_POST_HASH_KEY, $hash_key );
+		}
+
+		if ( $revision_storage['brizy-post']->get_api_page() ) {
+			$this->set_editor_data( $revision_storage['brizy-post']->get_api_page() );
+		} else {
+			$this->set_editor_data( $revision_storage['brizy-post']->get_editor_data() );
+		}
+
+		$this->api_page = null; //$revision_storage['brizy-post']->get_api_page();
+
+		$this->set_compiled_html_head( $revision_storage['brizy-post']->get_compiled_html_head() )
+		     ->set_compiled_html_body( $revision_storage['brizy-post']->get_compiled_html_body() )
+		     ->save();
 	}
 
 	/**
@@ -191,7 +239,22 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 	public function save() {
 
 		try {
+			//$brizy_editor_user = Brizy_Editor_User::get();
+			//$project           = Brizy_Editor_Project::get();
+			//$api_project       = $project->get_api_project();
+			//$updated_page      = $brizy_editor_user->update_page( $api_project, $this->api_page );
+			//$this->updatePageData( $updated_page );
+
+			// store the signature only once
+			//if ( ! ( $signature = get_post_meta( $this->wp_post_id, self::BRIZY_POST_SIGNATURE_KEY, true ) ) ) {
+			//update_post_meta( $this->wp_post_id, self::BRIZY_POST_SIGNATURE_KEY, Brizy_Editor_Signature::get() );
+			//update_post_meta( $this->wp_post_id, self::BRIZY_POST_HASH_KEY, $this->get_api_page()->get_id() );
+			//}
+
+			update_post_meta( $this->wp_post_id, self::BRIZY_POST_EDITOR_VERSION, BRIZY_EDITOR_VERSION );
+
 			$this->storage()->set( self::BRIZY_POST, $this );
+
 		} catch ( Exception $exception ) {
 			Brizy_Logger::instance()->exception( $exception );
 
@@ -238,7 +301,12 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 	 * @deprecated;
 	 */
 	public function get_api_page() {
-		return $this->api_page;
+
+		if ( isset( $this->api_page ) ) {
+			return $this->api_page;
+		}
+
+		return null;
 	}
 
 	/**
@@ -278,9 +346,19 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 	}
 
 	public function set_editor_data( $content ) {
-		$this->editor_data = stripslashes( $content );
+		$this->editor_data = $content;
 
 		return $this;
+	}
+
+	public function get_parent_id() {
+		$id = wp_is_post_revision( $this->get_id() );
+
+		if ( ! $id ) {
+			$id = $this->get_id();
+		}
+
+		return $id;
 	}
 
 	/**
@@ -363,7 +441,6 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 	 * @return Brizy_Editor_Storage_Post
 	 */
 	public function storage() {
-
 		return Brizy_Editor_Storage_Post::instance( $this->wp_post_id );
 	}
 
@@ -380,7 +457,9 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 	public function uses_editor() {
 
 		try {
-			return (bool) $this->storage()->get( Brizy_Editor_Constants::USES_BRIZY );
+			$brizy_editor_storage_post = $this->storage();
+
+			return (bool) $brizy_editor_storage_post->get( Brizy_Editor_Constants::USES_BRIZY );
 		} catch ( Exception $exception ) {
 			return false;
 		}
@@ -393,7 +472,7 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 	public function edit_url() {
 		return add_query_arg(
 			array( Brizy_Editor_Constants::EDIT_KEY => '' ),
-			get_permalink( $this->get_id() )
+			get_permalink( $this->get_parent_id() )
 		);
 	}
 

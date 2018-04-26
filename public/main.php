@@ -53,7 +53,7 @@ class Brizy_Public_Main {
 			add_action( 'wp_enqueue_scripts', 'wp_enqueue_media' );
 			//wp_enqueue_script( 'wp-api' );
 			//add_action( 'wp_head', array( $this, 'editor_head' ), 0 );
-			add_filter( 'the_content', array( $this, '_filter_the_content' ), 100 );
+			add_filter( 'the_content', array( $this, '_filter_the_content' ) );
 			add_filter( 'show_admin_bar', '__return_false' );
 			add_filter( 'body_class', array( $this, 'body_class_editor' ) );
 

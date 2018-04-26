@@ -72,7 +72,7 @@ class Brizy_Editor_Editor_Editor {
 				'preview_nonce' => wp_create_nonce( 'post_preview_' . $wp_post_id )
 			) );
 
-			$change_template_url = admin_url( 'admin-post.php?post=' . $this->get_post()->get_id() . '&action=_brizy_change_template' );
+			$change_template_url = admin_url( 'admin-post.php?post=' . $this->get_post()->get_parent_id() . '&action=_brizy_change_template' );
 			$templates           = $this->post->get_templates();
 		}
 

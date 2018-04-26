@@ -25,7 +25,10 @@ class Brizy_Public_AssetProxy extends Brizy_Public_AbstractProxy {
 			return;
 		}
 
-		$asset_path = "/" . ltrim( $wp_query->query_vars[ self::ENDPOINT ], "/" );
+		$endpoint_value = $wp_query->query_vars[ self::ENDPOINT ];
+
+		// clean endpoint value
+		$asset_path = "/" . ltrim( $endpoint_value, "/" );
 		$asset_url  = $this->url_builder->external_asset_url( $asset_path );
 
 		$tmp_asset_url = $this->url_builder->editor_asset_path( $asset_path );
