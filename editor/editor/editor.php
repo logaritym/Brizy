@@ -38,6 +38,10 @@ class Brizy_Editor_Editor_Editor {
 		$this->urlBuilder = new Brizy_Editor_UrlBuilder( $project, $post );
 	}
 
+	/**
+	 * @return Brizy_Editor_Post
+	 * @throws Exception
+	 */
 	protected function get_post() {
 
 		if ( ! ( $this->post instanceof Brizy_Editor_Post ) ) {
@@ -72,7 +76,6 @@ class Brizy_Editor_Editor_Editor {
 			$templates           = $this->post->get_templates();
 		}
 
-
 		$config = array(
 			'hosts'           => array(
 				'api'     => Brizy_Config::EDITOR_HOST_API,
@@ -100,16 +103,18 @@ class Brizy_Editor_Editor_Editor {
 				'change_template_url' => $change_template_url,
 				'backToWordpress'     => get_edit_post_link( $wp_post_id, null ),
 				'assets'              => $this->urlBuilder->editor_asset_url(),
+				'pageAssets'          => $this->urlBuilder->page_asset_url(),
 				'blockThumbnails'     => $this->urlBuilder->external_asset_url( 'template/img-block-thumbs' ),
 				'templateIcons'       => $this->urlBuilder->proxy_url( 'template/icons' ),
-
+				'site'                => site_url()
 			),
 			'user'            => $this->project->get_id(),
 			'wp'              => array(
-				'permalink'   => get_permalink( $wp_post_id ),
-				'page'        => $wp_post_id,
-				'templates'   => $templates,
-				'api'         => array(
+				'permalink'       => get_permalink( $wp_post_id ),
+				'page'            => $wp_post_id,
+				'pageAttachments' => array( 'images' => $this->get_page_attachments() ),
+				'templates'       => $templates,
+				'api'             => array(
 					'hash'             => wp_create_nonce( Brizy_Editor_API::nonce ),
 					'url'              => admin_url( 'admin-ajax.php' ),
 					'globals'          => array(
@@ -131,8 +136,9 @@ class Brizy_Editor_Editor_Editor {
 					'updatePost'       => Brizy_Editor_API::AJAX_SAVE_TRIGGER,
 					'savePage'         => Brizy_Editor_API::AJAX_SAVE_TRIGGER,
 					'getTerms'         => Brizy_Editor_API::AJAX_GET_TERMS,
+					'downloadMedia'    => Brizy_Editor_API::AJAX_DOWNLOAD_MEDIA,
 				),
-				'plugins'     => array(
+				'plugins'         => array(
 					'dummy'       => true,
 					'woocommerce' => $this->get_woocomerce_plugin_info(),
 				),
@@ -152,16 +158,26 @@ class Brizy_Editor_Editor_Editor {
 		return $config;
 	}
 
+	private function get_page_attachments() {
+		$page_upload_path = $this->urlBuilder->upload_path();
+		$attachment_path  = $page_upload_path . $this->urlBuilder->page_asset_path();
 
-	public function get_asset_url( $template_version = null ) {
+		$attachments     = glob( $attachment_path . "/*.*" );
+		$attachment_data = array();
 
-		$upload_dir_info = wp_upload_dir( null, true );
 
-		if ( is_null( $template_version ) ) {
-			$template_version = BRIZY_EDITOR_VERSION;
+		foreach ( $attachments as $file ) {
+
+			$basename                     = basename( $file );
+			$attachment_data[ $basename ] = true;
+//			$fpath     = ltrim( str_replace( $attachment_path, '', $file ), "/" );
+//			$file_data = explode( '/', $fpath );
+//			if ( count( $file_data ) >= 2 ) {
+//				$attachment_data[ $basename ][ $file_data[0] ] = true;
+//			}
 		}
 
-		return $upload_dir_info['baseurl'] . sprintf( Brizy_Config::BRIZY_WP_EDITOR_ASSET_PATH, $template_version );
+		return (object) $attachment_data;
 	}
 
 	private function get_woocomerce_plugin_info() {

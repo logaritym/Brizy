@@ -23,9 +23,7 @@ class Brizy_Editor_UrlBuilder {
 	 * @param Brizy_Editor_Project|null $project
 	 * @param Brizy_Editor_Post|null $post
 	 */
-	public function __construct( Brizy_Editor_Project $project = null, Brizy_Editor_Post $post = null ) {
-
-		global $wp_rewrite;
+	public function __construct( $project = null, $post = null ) {
 
 		$this->project    = $project;
 		$this->post       = $post;
@@ -41,13 +39,36 @@ class Brizy_Editor_UrlBuilder {
 	public function application_form_url() {
 		return sprintf( Brizy_Config::BRIZY_APPLICATION_FORM_URL, Brizy_Config::BRIZY_APPLICATION_FORM_ID, urlencode( $this->multipass_url() ) );
 	}
+	/**
+	 * @param $post
+	 */
+	public function set_post( $post ) {
+		$this->post = $post;
+	}
 
 	public function multipass_url() {
 		return admin_url( 'admin-ajax.php' ) . "?action=brizy_multipass_create&client_id=" . Brizy_Config::BRIZY_APPLICATION_FORM_ID;
 	}
 
-	public function proxy_url( $end_point ) {
+	/**
+	 * @param string $end_point
+	 *
+	 * @return string
+	 */
+	public function proxy_url( $end_point = '' ) {
 		return site_url() . '?brizy=' . $end_point;
+	}
+
+	/**
+	 * @param string $end_point
+	 *
+	 * @return string
+	 */
+	public function media_proxy_url( $end_point = '' ) {
+
+		$end_point = ltrim( $end_point, "/" );
+
+		return $this->proxy_url( "/media/" . $end_point );
 	}
 
 	/**
@@ -70,26 +91,35 @@ class Brizy_Editor_UrlBuilder {
 
 	/**
 	 * This will return the relative path to the upload dir.
-	 * ex: /brizy/pages/9.0.6/3/x.jpg
+	 * ex: /brizy/pages/3/x.jpg
 	 *
 	 * @param null $path
-	 * @param null $template_version
 	 * @param null $post_id
 	 *
 	 * @return string
 	 */
-	public function page_asset_path( $path = null, $template_version = null, $post_id = null ) {
+	public function page_asset_path( $path = null, $post_id = null ) {
 
-		if ( is_null( $template_version ) ) {
-			$template_version = BRIZY_EDITOR_VERSION;
-		}
 		if ( is_null( $post_id ) ) {
 			$post_id = $this->post->get_id();
 		}
 
-		$path = "/" . ltrim( $path, "/" );
+		if ( $path ) {
+			$path = "/" . ltrim( $path, "/" );
+		}
 
-		return sprintf( Brizy_Config::BRIZY_WP_PAGE_ASSET_PATH . $path, $template_version, $post_id );
+		return sprintf( Brizy_Config::LOCAL_PAGE_ASSET_STATIC_URL . $path, $post_id );
+	}
+
+	/**
+	 * @param null $path
+	 * @param null $post_id
+	 *
+	 * @return string
+	 */
+	public function page_asset_url( $path = null, $post_id = null ) {
+
+		return $this->upload_url( $this->page_asset_path( $path, $post_id ) );
 	}
 
 	/**
@@ -107,7 +137,9 @@ class Brizy_Editor_UrlBuilder {
 			$template_version = BRIZY_EDITOR_VERSION;
 		}
 
-		$path = "/" . ltrim( $path, "/" );
+		if ( $path ) {
+			$path = "/" . ltrim( $path, "/" );
+		}
 
 		return sprintf( Brizy_Config::BRIZY_WP_EDITOR_ASSET_PATH . $path, $template_version );
 	}
@@ -155,7 +187,9 @@ class Brizy_Editor_UrlBuilder {
 			$template_version = BRIZY_EDITOR_VERSION;
 		}
 
-		$path = "/" . ltrim( $path, "/" );
+		if ( $path ) {
+			$path = "/" . ltrim( $path, "/" );
+		}
 
 		return sprintf( Brizy_Config::S3_ASSET_URL . $path, $template_slug, $template_version );
 	}

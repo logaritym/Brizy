@@ -8,7 +8,7 @@ class Brizy_Editor_API {
 	const AJAX_UPDATE = 'brizy_update_item';
 	const AJAX_GET_GLOBALS = 'brizy_get_gb';
 	const AJAX_SET_GLOBALS = 'brizy_set_gb';
-	const AJAX_MEDIA = 'Brizy_Editor_Asset_Media';
+	const AJAX_MEDIA = 'brizy_media';
 	const AJAX_SIDEBARS = 'brizy_sidebars';
 	const AJAX_BUILD = 'brizy_build';
 	const AJAX_SIDEBAR_CONTENT = 'brizy_sidebar_content';
@@ -28,6 +28,7 @@ class Brizy_Editor_API {
 	const AJAX_FORM_INTEGRATION_STATUS = 'brizy_form_integration_status';
 	const AJAX_SUBMIT_FORM = 'brizy_submit_form';
 
+	const AJAX_DOWNLOAD_MEDIA = 'brizy_download_media';
 
 	/**
 	 * @var Brizy_Editor_Project
@@ -85,6 +86,8 @@ class Brizy_Editor_API {
 		add_action( 'wp_ajax_' . self::AJAX_GET_MENU_LIST, array( $this, 'get_menu_list' ) );
 		add_action( 'wp_ajax_' . self::AJAX_SAVE_TRIGGER, array( $this, 'save_trigger' ) );
 		add_action( 'wp_ajax_' . self::AJAX_GET_TERMS, array( $this, 'get_terms' ) );
+		add_action( 'wp_ajax_' . self::AJAX_GET_TERMS, array( $this, 'get_terms' ) );
+		add_action( 'wp_ajax_' . self::AJAX_DOWNLOAD_MEDIA, array( $this, 'download_media' ) );
 		add_action( 'wp_ajax_' . self::AJAX_JWT_TOKEN, array( $this, 'multipass_create' ) );
 
 		add_action( 'wp_ajax_' . self::AJAX_GET_DEFAULT_FORM, array( $this, 'default_form' ) );
@@ -657,6 +660,9 @@ class Brizy_Editor_API {
 	 *      'url'=>'term url',
 	 *      'taxonomy'=>'taxonomy name']
 	 *
+	 *
+	 * @param $search_term
+	 *
 	 * @return array
 	 */
 	private function get_term_link_list( $search_term ) {
@@ -765,6 +771,21 @@ class Brizy_Editor_API {
 		@header( 'Content-Type: application/json; charset=' . get_option( 'blog_charset' ) );
 
 		wp_send_json( array_values( $terms ) );
+	}
+
+	public function download_media() {
+		try {
+			$project = Brizy_Editor_Project::get();
+			$apost   = (int) $_REQUEST['post_id'];
+			$post    = Brizy_Editor_Post::get( $apost );
+
+			$media_cacher = new Brizy_Editor_CropCacheMedia( $project, $post );
+			$media_cacher->download_original_image( $_REQUEST['media'] );
+
+			wp_send_json( [], 200 );
+		} catch ( Exception $e ) {
+			wp_send_json_error( [], 500 );
+		}
 	}
 
 }
