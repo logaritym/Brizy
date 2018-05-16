@@ -8,8 +8,7 @@
 
 class Brizy_Public_CropProxy extends Brizy_Public_AbstractProxy {
 
-	const ENDPOINT_EXTERNAL = 'brizy_media';
-	const ENDPOINT_INTERNAL = 'brizy_local_media';
+	const ENDPOINT = 'brizy_media';
 	const ENDPOINT_FILTER = 'brizy_crop';
 	const ENDPOINT_POST = 'brizy_post';
 
@@ -46,12 +45,13 @@ class Brizy_Public_CropProxy extends Brizy_Public_AbstractProxy {
 			return;
 		}
 
-		if ( isset( $vars[ self::ENDPOINT_EXTERNAL ] ) && is_string( $vars[ self::ENDPOINT_EXTERNAL ] ) && ! empty( $vars[ self::ENDPOINT_EXTERNAL ] ) ) {
-			$this->crop_external_asset( $vars[ self::ENDPOINT_EXTERNAL ], urldecode( $vars[ self::ENDPOINT_FILTER ] ), (int) $vars[ self::ENDPOINT_POST ] );
-		}
+		if ( isset( $vars[ self::ENDPOINT ] ) && is_string( $vars[ self::ENDPOINT ] ) && ! empty( $vars[ self::ENDPOINT ] ) ) {
 
-		if ( isset( $vars[ self::ENDPOINT_INTERNAL ] ) && is_string( $vars[ self::ENDPOINT_INTERNAL ] ) && ! empty( $vars[ self::ENDPOINT_INTERNAL ] ) ) {
-			$this->crop_local_asset( (int) $vars[ self::ENDPOINT_INTERNAL ], urldecode( $vars[ self::ENDPOINT_FILTER ] ), (int) $vars[ self::ENDPOINT_POST ] );
+			if ( is_numeric( $vars[ self::ENDPOINT ] ) ) {
+				$this->crop_local_asset( (int) $vars[ self::ENDPOINT_INTERNAL ], urldecode( $vars[ self::ENDPOINT_FILTER ] ), (int) $vars[ self::ENDPOINT_POST ] );
+			} else {
+				$this->crop_external_asset( $vars[ self::ENDPOINT_EXTERNAL ], urldecode( $vars[ self::ENDPOINT_FILTER ] ), (int) $vars[ self::ENDPOINT_POST ] );
+			}
 		}
 	}
 
