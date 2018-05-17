@@ -46,11 +46,16 @@ class Brizy_Public_CropProxy extends Brizy_Public_AbstractProxy {
 
 		if ( isset( $vars[ self::ENDPOINT ] ) && is_string( $vars[ self::ENDPOINT ] ) && ! empty( $vars[ self::ENDPOINT ] ) ) {
 
-			if ( is_numeric( $vars[ self::ENDPOINT ] ) ) {
-				$this->crop_local_asset( (int) $vars[ self::ENDPOINT ], urldecode( $vars[ self::ENDPOINT_FILTER ] ), (int) $vars[ self::ENDPOINT_POST ] );
-			} else {
-				$this->crop_external_asset( $vars[ self::ENDPOINT ], urldecode( $vars[ self::ENDPOINT_FILTER ] ), (int) $vars[ self::ENDPOINT_POST ] );
+			try {
+				if ( is_numeric( $vars[ self::ENDPOINT ] ) ) {
+					$this->crop_local_asset( (int) $vars[ self::ENDPOINT ], urldecode( $vars[ self::ENDPOINT_FILTER ] ), (int) $vars[ self::ENDPOINT_POST ] );
+				} else {
+					$this->crop_external_asset( $vars[ self::ENDPOINT ], urldecode( $vars[ self::ENDPOINT_FILTER ] ), (int) $vars[ self::ENDPOINT_POST ] );
+				}
+			} catch (Exception $e) {
+				Brizy_Logger::instance()->exception($e);
 			}
+
 		}
 	}
 
