@@ -43,7 +43,7 @@ class Brizy_Editor_CropCacheMedia extends Brizy_Editor_Asset_StaticFile {
 
 		// Check if user is querying API
 		if ( ! $madia_name ) {
-			Brizy_Logger::instance()->error('Empty media file provided');
+			Brizy_Logger::instance()->error( 'Empty media file provided' );
 			throw new InvalidArgumentException( "Invalid media file" );
 		}
 
@@ -55,7 +55,9 @@ class Brizy_Editor_CropCacheMedia extends Brizy_Editor_Asset_StaticFile {
 
 			if ( ! $this->store_file( $external_asset_url, $original_asset_path ) ) {
 				// unable to save the attachment
-				Brizy_Logger::instance()->error('Unable to store original media file',array('source'=>$external_asset_url,'destination'=>$original_asset_path));
+				Brizy_Logger::instance()->error( 'Unable to store original media file', array( 'source'      => $external_asset_url,
+				                                                                               'destination' => $original_asset_path
+				) );
 				throw new Exception( 'Unable to cache media' );
 			}
 
@@ -63,7 +65,9 @@ class Brizy_Editor_CropCacheMedia extends Brizy_Editor_Asset_StaticFile {
 			$parent_post_id = $this->post->get_id();
 			$attach_to_post = $this->attach_to_post( $original_asset_path, $parent_post_id );
 			if ( $attach_to_post === 0 || is_wp_error( $attach_to_post ) ) {
-				Brizy_Logger::instance()->error('Unable to attach media file',array('media'=>$original_asset_path,'parent_post'=>$parent_post_id));
+				Brizy_Logger::instance()->error( 'Unable to attach media file', array( 'media'       => $original_asset_path,
+				                                                                       'parent_post' => $parent_post_id
+				) );
 				throw new Exception( 'Unable to attach media' );
 			}
 		}
@@ -97,7 +101,7 @@ class Brizy_Editor_CropCacheMedia extends Brizy_Editor_Asset_StaticFile {
 
 			if ( ! file_exists( $resized_image_path ) ) {
 
-				@mkdir( $resized_page_asset_path);
+				@mkdir( $resized_page_asset_path );
 
 				$imagine = $this->crop( $original_asset_path, $media_filter );
 
@@ -119,50 +123,45 @@ class Brizy_Editor_CropCacheMedia extends Brizy_Editor_Asset_StaticFile {
 	 * @return \Imagine\Gd\Image|\Imagine\Image\ImageInterface|null|static
 	 */
 	private function crop( $original_path, $resize_params ) {
-		try {
-			$imagine        = $this->getImagine();
-			$original_image = $imagine->open( $original_path );
-			$new_image      = null;
+		$imagine        = $this->getImagine();
+		$original_image = $imagine->open( $original_path );
+		$new_image      = null;
 
-			$regExAdvanced = "/^iW=[0-9]{1,4}&iH=[0-9]{1,4}&oX=[0-9]{1,4}&oY=[0-9]{1,4}&cW=[0-9]{1,4}&cH=[0-9]{1,4}$/is";
-			$regExBasic    = "/^iW=[0-9]{1,4}&iH=([0-9]{1,4}|any|\*{1})$/is";
-			if ( preg_match( $regExBasic, $resize_params ) ) {
-				$cropType = self::BASIC_CROP_TYPE;
-			} elseif ( preg_match( $regExAdvanced, $resize_params ) ) {
-				$cropType = self::ADVANCED_CROP_TYPE;
-			} else {
-				throw new Exception( "Invalid size format." );
-			}
+		$regExAdvanced = "/^iW=[0-9]{1,4}&iH=[0-9]{1,4}&oX=[0-9]{1,4}&oY=[0-9]{1,4}&cW=[0-9]{1,4}&cH=[0-9]{1,4}$/is";
+		$regExBasic    = "/^iW=[0-9]{1,4}&iH=([0-9]{1,4}|any|\*{1})$/is";
+		if ( preg_match( $regExBasic, $resize_params ) ) {
+			$cropType = self::BASIC_CROP_TYPE;
+		} elseif ( preg_match( $regExAdvanced, $resize_params ) ) {
+			$cropType = self::ADVANCED_CROP_TYPE;
+		} else {
+			throw new Exception( "Invalid size format." );
+		}
 
-			$filter_configuration                 = $this->getFilterOptions( $cropType, $original_path, $resize_params );
-			$original_box                         = $original_image->getSize();
-			$filter_configuration['originalSize'] = array( $original_box->getWidth(), $original_box->getHeight() );
+		$filter_configuration                 = $this->getFilterOptions( $cropType, $original_path, $resize_params );
+		$original_box                         = $original_image->getSize();
+		$filter_configuration['originalSize'] = array( $original_box->getWidth(), $original_box->getHeight() );
 
-			if ( $filter_configuration['format'] == "gif" ) {
-				// do not resize
-				$new_image = $original_image;
-			} else {
-				if ( $filter_configuration['is_advanced'] === false ) {
-					list( $imageWidth, $imageHeight ) = array_values( $filter_configuration['requestedData'] );
-					list( $originalWidth, $originalHeight ) = $filter_configuration['originalSize'];
-					if ( $imageWidth > $originalWidth && ( $imageHeight == "any" || $imageHeight == "*" ) ) {
-						return $original_image;
-					}
-
-					return $this->relativeResize( $original_image, $imageWidth, $imageHeight );
+		if ( $filter_configuration['format'] == "gif" ) {
+			// do not resize
+			$new_image = $original_image;
+		} else {
+			if ( $filter_configuration['is_advanced'] === false ) {
+				list( $imageWidth, $imageHeight ) = array_values( $filter_configuration['requestedData'] );
+				list( $originalWidth, $originalHeight ) = $filter_configuration['originalSize'];
+				if ( $imageWidth > $originalWidth && ( $imageHeight == "any" || $imageHeight == "*" ) ) {
+					return $original_image;
 				}
 
-				list( $imageWidth, $imageHeight, $offsetX, $offsetY, $cropWidth, $cropHeight ) = array_values( $filter_configuration['requestedData'] );
-				$image     = $this->relativeResize( $original_image, $imageWidth, $imageHeight );
-				$filter    = new \Imagine\Filter\Basic\Crop( new \Imagine\Image\Point( $offsetX, $offsetY ), new \Imagine\Image\Box( $cropWidth, $cropHeight ) );
-				$new_image = $filter->apply( $image );
+				return $this->relativeResize( $original_image, $imageWidth, $imageHeight );
 			}
 
-			return $new_image;
-
-		} catch ( Exception $e ) {
-			return null;
+			list( $imageWidth, $imageHeight, $offsetX, $offsetY, $cropWidth, $cropHeight ) = array_values( $filter_configuration['requestedData'] );
+			$image     = $this->relativeResize( $original_image, $imageWidth, $imageHeight );
+			$filter    = new \Imagine\Filter\Basic\Crop( new \Imagine\Image\Point( $offsetX, $offsetY ), new \Imagine\Image\Box( $cropWidth, $cropHeight ) );
+			$new_image = $filter->apply( $image );
 		}
+
+		return $new_image;
 	}
 
 	private function relativeResize( $image, $imageWidth, $imageHeight ) {

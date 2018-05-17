@@ -75,7 +75,7 @@ class Brizy_Editor_API {
 		add_action( 'wp_ajax_' . self::AJAX_UPDATE, array( $this, 'update_item' ) );
 		add_action( 'wp_ajax_' . self::AJAX_GET_GLOBALS, array( $this, 'get_globals' ) );
 		add_action( 'wp_ajax_' . self::AJAX_SET_GLOBALS, array( $this, 'set_globals' ) );
-		add_action( 'wp_ajax_' . self::AJAX_MEDIA, array( $this, 'media' ) );
+		//add_action( 'wp_ajax_' . self::AJAX_MEDIA, array( $this, 'media' ) );
 		add_action( 'wp_ajax_' . self::AJAX_SIDEBARS, array( $this, 'get_sidebars' ) );
 		//add_action( 'wp_ajax_' . self::AJAX_BUILD, array( $this, 'build_content' ) );
 		add_action( 'wp_ajax_' . self::AJAX_SIDEBAR_CONTENT, array( $this, 'sidebar_content' ) );
@@ -574,22 +574,22 @@ class Brizy_Editor_API {
 	/**
 	 * @internal
 	 **/
-	public function media() {
-		try {
-			$this->authorize();
-
-			$attachment_id = $this->param( 'attachmentId' );
-
-			$brizy_editor_user = Brizy_Editor_User::get();
-			$this->success( $brizy_editor_user->get_media_id(
-				$this->project,
-				$attachment_id
-			) );
-		} catch ( Exception $exception ) {
-			Brizy_Logger::instance()->exception( $exception );
-			$this->error( $exception->getCode(), $exception->getMessage() );
-		}
-	}
+//	public function media() {
+//		try {
+//			$this->authorize();
+//
+//			$attachment_id = $this->param( 'attachmentId' );
+//
+//			$brizy_editor_user = Brizy_Editor_User::get();
+//			$this->success( $brizy_editor_user->get_media_id(
+//				$this->project,
+//				$attachment_id
+//			) );
+//		} catch ( Exception $exception ) {
+//			Brizy_Logger::instance()->exception( $exception );
+//			$this->error( $exception->getCode(), $exception->getMessage() );
+//		}
+//	}
 
 	protected function param( $name ) {
 		if ( isset( $_REQUEST[ $name ] ) ) {
