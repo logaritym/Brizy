@@ -48,14 +48,17 @@ class Brizy_Public_CropProxy extends Brizy_Public_AbstractProxy {
 
 			try {
 				if ( is_numeric( $vars[ self::ENDPOINT ] ) ) {
-					$this->crop_local_asset( (int) $vars[ self::ENDPOINT ], urldecode( $vars[ self::ENDPOINT_FILTER ] ), (int) $vars[ self::ENDPOINT_POST ] );
+					$this->crop_local_asset( (int) $vars[ self::ENDPOINT ], html_entity_decode( $vars[ self::ENDPOINT_FILTER ] ), (int) $vars[ self::ENDPOINT_POST ] );
 				} else {
-					$this->crop_external_asset( $vars[ self::ENDPOINT ], urldecode( $vars[ self::ENDPOINT_FILTER ] ), (int) $vars[ self::ENDPOINT_POST ] );
+					$this->crop_external_asset( $vars[ self::ENDPOINT ], html_entity_decode( $vars[ self::ENDPOINT_FILTER ] ), (int) $vars[ self::ENDPOINT_POST ] );
 				}
 			} catch (Exception $e) {
 				Brizy_Logger::instance()->exception($e);
-			}
 
+				global $wp_query;
+				$wp_query->set_404();
+				return;
+			}
 		}
 	}
 

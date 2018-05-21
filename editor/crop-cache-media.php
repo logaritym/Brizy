@@ -101,7 +101,7 @@ class Brizy_Editor_CropCacheMedia extends Brizy_Editor_Asset_StaticFile {
 
 			if ( ! file_exists( $resized_image_path ) ) {
 
-				@mkdir( $resized_page_asset_path );
+				@mkdir( $resized_page_asset_path,  0755, true );
 
 				$imagine = $this->crop( $original_asset_path, $media_filter );
 

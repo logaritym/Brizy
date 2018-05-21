@@ -24,7 +24,7 @@ abstract class Brizy_Editor_Asset_StaticFile {
 			$dir_path = dirname( $asset_path );
 
 			if ( ! file_exists( $dir_path ) ) {
-				mkdir( $dir_path, 0777, true );
+				@mkdir( $dir_path, 0755, true );
 			}
 
 
