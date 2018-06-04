@@ -58,11 +58,11 @@ abstract class Brizy_Editor_Asset_StaticFile {
 	 *
 	 * @param $asset_path
 	 * @param $post_id
-	 * @param string $title
+	 * @param string $key_value
 	 *
-	 * @return bool|int
+	 * @return bool|int|WP_Error
 	 */
-	public function attach_to_post( $asset_path, $post_id, $title = '' ) {
+	public function attach_to_post( $asset_path, $post_id, $key_value = '' ) {
 
 		if ( ! $post_id ) {
 			return false;
@@ -75,32 +75,34 @@ abstract class Brizy_Editor_Asset_StaticFile {
 
 		$attachment = array(
 			'post_mime_type' => $filetype['type'],
-			'post_title'     => $title ? $title : basename( $asset_path ),
+			'post_title'     =>  basename( $asset_path ),
 			'post_content'   => '',
 			'post_status'    => 'inherit'
 		);
 
-		$result = wp_insert_attachment( $attachment, $asset_path, $post_id );
+		$attachment_id = wp_insert_attachment( $attachment, $asset_path, $post_id );
 
-		if ( is_wp_error( $result ) ) {
+		if ( is_wp_error( $attachment_id ) || $attachment_id === 0 ) {
 			return false;
 		}
 
-		if(!function_exists('wp_generate_attachment_metadata'))
-		{
-			include_once ABSPATH."/wp-admin/includes/image.php";
+		update_post_meta( $attachment_id, 'brizy_attachment', $key_value );
+
+		if ( ! function_exists( 'wp_generate_attachment_metadata' ) ) {
+			include_once ABSPATH . "/wp-admin/includes/image.php";
 		}
 
-		$attach_data = wp_generate_attachment_metadata( $result, $asset_path );
-		wp_update_attachment_metadata( $result,  $attach_data );
+		$attach_data = wp_generate_attachment_metadata( $attachment_id, $asset_path );
+		wp_update_attachment_metadata( $attachment_id, $attach_data );
 
-		return $result;
+
+		return $attachment_id;
 	}
 
 	/**
 	 * @param $filename
 	 */
-	public function send_file( $filename ){
+	public function send_file( $filename ) {
 		if ( file_exists( $filename ) ) {
 
 			$content = file_get_contents( $filename );
@@ -124,6 +126,7 @@ abstract class Brizy_Editor_Asset_StaticFile {
 		} else {
 			global $wp_query;
 			$wp_query->set_404();
+
 			return;
 		}
 

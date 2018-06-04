@@ -55,18 +55,20 @@ class Brizy_Editor_CropCacheMedia extends Brizy_Editor_Asset_StaticFile {
 
 			if ( ! $this->store_file( $external_asset_url, $original_asset_path ) ) {
 				// unable to save the attachment
-				Brizy_Logger::instance()->error( 'Unable to store original media file', array( 'source'      => $external_asset_url,
-				                                                                               'destination' => $original_asset_path
+				Brizy_Logger::instance()->error( 'Unable to store original media file', array(
+					'source'      => $external_asset_url,
+					'destination' => $original_asset_path
 				) );
 				throw new Exception( 'Unable to cache media' );
 			}
 
 			// attach to post
 			$parent_post_id = $this->post->get_id();
-			$attach_to_post = $this->attach_to_post( $original_asset_path, $parent_post_id );
+			$attach_to_post = $this->attach_to_post( $original_asset_path, $parent_post_id, $madia_name );
 			if ( $attach_to_post === 0 || is_wp_error( $attach_to_post ) ) {
-				Brizy_Logger::instance()->error( 'Unable to attach media file', array( 'media'       => $original_asset_path,
-				                                                                       'parent_post' => $parent_post_id
+				Brizy_Logger::instance()->error( 'Unable to attach media file', array(
+					'media'       => $original_asset_path,
+					'parent_post' => $parent_post_id
 				) );
 				throw new Exception( 'Unable to attach media' );
 			}
@@ -101,7 +103,7 @@ class Brizy_Editor_CropCacheMedia extends Brizy_Editor_Asset_StaticFile {
 
 			if ( ! file_exists( $resized_image_path ) ) {
 
-				@mkdir( $resized_page_asset_path,  0755, true );
+				@mkdir( $resized_page_asset_path, 0755, true );
 
 				$imagine = $this->crop( $original_asset_path, $media_filter );
 

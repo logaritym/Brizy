@@ -69,7 +69,5 @@ class Brizy_Public_AssetProxy extends Brizy_Public_AbstractProxy {
 		$wp_query->set_404();
 
 		return;
-
 	}
-
 }
