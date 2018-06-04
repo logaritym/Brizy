@@ -29,6 +29,7 @@ class Brizy_Editor_API {
 	const AJAX_SUBMIT_FORM = 'brizy_submit_form';
 
 	const AJAX_DOWNLOAD_MEDIA = 'brizy_download_media';
+	const AJAX_MEDIA_METAKEY = 'brizy_get_media_key';
 
 	/**
 	 * @var Brizy_Editor_Project
@@ -88,6 +89,7 @@ class Brizy_Editor_API {
 		add_action( 'wp_ajax_' . self::AJAX_GET_TERMS, array( $this, 'get_terms' ) );
 		add_action( 'wp_ajax_' . self::AJAX_GET_TERMS, array( $this, 'get_terms' ) );
 		add_action( 'wp_ajax_' . self::AJAX_DOWNLOAD_MEDIA, array( $this, 'download_media' ) );
+		add_action( 'wp_ajax_' . self::AJAX_MEDIA_METAKEY, array( $this, 'get_media_key' ) );
 		add_action( 'wp_ajax_' . self::AJAX_JWT_TOKEN, array( $this, 'multipass_create' ) );
 
 		add_action( 'wp_ajax_' . self::AJAX_GET_DEFAULT_FORM, array( $this, 'default_form' ) );
