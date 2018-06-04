@@ -790,4 +790,38 @@ class Brizy_Editor_API {
 		}
 	}
 
+	public function get_media_key() {
+		try {
+			$apost         = (int) $_REQUEST['post_id'];
+			$attachment_id = (int) $_REQUEST['attachment_id'];
+
+			if ( ! $attachment_id ) {
+				$this->error( 400, 'Invalid attachment id' );
+			}
+
+			$uid = get_post_meta( $attachment_id, 'brizy_attachment_uid', true );
+
+			if ( ! $uid ) {
+				$uid = md5( $attachment_id . time() );
+				update_post_meta( $attachment_id, 'brizy_attachment_uid', $uid );
+			}
+
+			if ( $apost ) {
+				$post    = Brizy_Editor_Post::get( $apost );
+				$post_ui = $post->get_uid();
+
+				$post_uids = get_post_meta( $attachment_id, 'brizy_post_uid' );
+
+				if ( ! in_array( $post_ui, $post_uids ) ) {
+					add_post_meta( $attachment_id, 'brizy_post_uid', $post_ui );
+				}
+			}
+
+			$this->success( array( 'uid' => $uid ) );
+
+		} catch ( Exception $E ) {
+			return;
+		}
+	}
+
 }

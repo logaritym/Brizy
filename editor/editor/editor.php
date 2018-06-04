@@ -159,6 +159,13 @@ class Brizy_Editor_Editor_Editor {
 	}
 
 	private function get_page_attachments() {
+
+		$posts = get_posts(array(
+
+		));
+
+
+
 		$page_upload_path = $this->urlBuilder->upload_path();
 		$attachment_path  = $page_upload_path . $this->urlBuilder->page_asset_path();
 

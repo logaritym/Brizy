@@ -127,6 +127,7 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 
 		$post->wp_post_id = $wp_post_id;
 		$post->wp_post    = get_post( $wp_post_id );
+		$post->create_uid();
 
 		return $post;
 	}
@@ -254,10 +255,14 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 		$this->uid = get_post_meta( $this->wp_post_id, 'brizy_post_uid', true );
 
 		if ( ! $this->uid ) {
-			$this->uid = md5( $this->wp_post_id, time() );
+			$this->uid = md5( $this->wp_post_id . time() );
 			update_post_meta( $this->wp_post_id, 'brizy_post_uid', $this->uid );
 		}
 
+		return $this->uid;
+	}
+
+	public function get_uid() {
 		return $this->uid;
 	}
 
