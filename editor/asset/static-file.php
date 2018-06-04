@@ -61,6 +61,8 @@ abstract class Brizy_Editor_Asset_StaticFile {
 	 * @param string $key_value
 	 *
 	 * @return bool|int|WP_Error
+	 * @throws Brizy_Editor_Exceptions_NotFound
+	 * @throws Brizy_Editor_Exceptions_UnsupportedPostType
 	 */
 	public function attach_to_post( $asset_path, $post_id, $key_value = '' ) {
 
@@ -71,11 +73,13 @@ abstract class Brizy_Editor_Asset_StaticFile {
 			return false;
 		}
 
+		$bpost = Brizy_Editor_Post::get( $post_id );
+
 		$filetype = wp_check_filetype( $asset_path );
 
 		$attachment = array(
 			'post_mime_type' => $filetype['type'],
-			'post_title'     =>  basename( $asset_path ),
+			'post_title'     => basename( $asset_path ),
 			'post_content'   => '',
 			'post_status'    => 'inherit'
 		);
@@ -86,7 +90,8 @@ abstract class Brizy_Editor_Asset_StaticFile {
 			return false;
 		}
 
-		update_post_meta( $attachment_id, 'brizy_attachment', $key_value );
+		update_post_meta( $attachment_id, 'brizy_attachment_uid', $key_value );
+		update_post_meta( $attachment_id, 'brizy_post_uid', $bpost->get_uid() );
 
 		if ( ! function_exists( 'wp_generate_attachment_metadata' ) ) {
 			include_once ABSPATH . "/wp-admin/includes/image.php";

@@ -39,9 +39,9 @@ class Brizy_Editor_Asset_MediaAssetProcessor implements Brizy_Editor_Asset_Proce
 	public function process_external_asset_urls( $content ) {
 
 		$site_url = site_url();
-		$site_url = str_replace(array('/','.'),array('\/','\.'), $site_url);
+		$site_url = str_replace( array( '/', '.' ), array( '\/', '\.' ), $site_url );
 
-		preg_match_all( '/'.$site_url.'\/?(\?' . Brizy_Public_CropProxy::ENDPOINT . '=(.[^"\',\s)]*))/im', $content, $matches );
+		preg_match_all( '/' . $site_url . '\/?(\?' . Brizy_Public_CropProxy::ENDPOINT . '=(.[^"\',\s)]*))/im', $content, $matches );
 
 		if ( ! isset( $matches[0] ) || count( $matches[0] ) == 0 ) {
 			return $content;
@@ -68,13 +68,13 @@ class Brizy_Editor_Asset_MediaAssetProcessor implements Brizy_Editor_Asset_Proce
 
 			$new_url = null;
 
-			if ( is_numeric( $params[ Brizy_Public_CropProxy::ENDPOINT ] ) ) {
-				$media_path      = get_attached_file( (int) $params[ Brizy_Public_CropProxy::ENDPOINT ] );
-				$crop_media_path = $media_cache->crop_media( $media_path, $params[ Brizy_Public_CropProxy::ENDPOINT_FILTER ] );
-			} else {
-				$original_path   = $media_cache->download_original_image( $params[ Brizy_Public_CropProxy::ENDPOINT ] );
-				$crop_media_path = $media_cache->crop_media( $original_path, $params[ Brizy_Public_CropProxy::ENDPOINT_FILTER ] );
+			$media_path = $this->get_attachment_file_by_uid( $params[ Brizy_Public_CropProxy::ENDPOINT ] );
+
+			if ( ! $media_path ) {
+				continue;
 			}
+
+			$crop_media_path = $media_cache->crop_media( $media_path, $params[ Brizy_Public_CropProxy::ENDPOINT_FILTER ] );
 
 			$urlBuilder      = new Brizy_Editor_UrlBuilder( $project, $brizy_post );
 			$local_media_url = str_replace( $urlBuilder->upload_path(), $urlBuilder->upload_url(), $crop_media_path );
@@ -85,6 +85,21 @@ class Brizy_Editor_Asset_MediaAssetProcessor implements Brizy_Editor_Asset_Proce
 		return $content;
 	}
 
+	private function get_attachment_file_by_uid( $uid ) {
+		$attachments = get_posts( array(
+			'meta_key'    => 'brizy_attachment_uid',
+			'meta_value'  => $uid,
+			'post_type'   => 'attachment',
+			'post_status' => 'publish'
+		) );
+
+		if ( count( $attachments ) == 0 ) {
+			return;
+		}
+
+		return get_attached_file( $attachments[0]->ID );
+
+	}
 
 //	public function process_external_asset_urls( $content ) {
 //		$regex = Brizy_Config::MEDIA_IMAGE_URL_REGEX;

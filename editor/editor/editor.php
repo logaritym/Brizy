@@ -142,8 +142,8 @@ class Brizy_Editor_Editor_Editor {
 					'dummy'       => true,
 					'woocommerce' => $this->get_woocomerce_plugin_info(),
 				),
-				'hasSidebars' => count( $wp_registered_sidebars ) > 0,
-				'l10n'        => Brizy_Languages_Texts::get_editor_texts()
+				'hasSidebars'     => count( $wp_registered_sidebars ) > 0,
+				'l10n'            => Brizy_Languages_Texts::get_editor_texts()
 			),
 			'applications'    => array(
 				'form' => array(
@@ -159,29 +159,18 @@ class Brizy_Editor_Editor_Editor {
 	}
 
 	private function get_page_attachments() {
+		global $wpdb;
 
-		$posts = get_posts(array(
+		$query = $wpdb->prepare( "SELECT p.guid FROM {$wpdb->prefix}postmeta m
+				  JOIN {$wpdb->prefix}posts p ON p.ID=m.post_id and p.post_type='attachment'
+				  WHERE m.meta_key='brizy_post_uid' and m.meta_value=%s", $this->post->get_uid() );
 
-		));
+		$results = $wpdb->get_results( $query  );
 
+		foreach ( $results as $file ) {
 
-
-		$page_upload_path = $this->urlBuilder->upload_path();
-		$attachment_path  = $page_upload_path . $this->urlBuilder->page_asset_path();
-
-		$attachments     = glob( $attachment_path . "/*.*" );
-		$attachment_data = array();
-
-
-		foreach ( $attachments as $file ) {
-
-			$basename                     = basename( $file );
+			$basename                     = basename( $file->guid );
 			$attachment_data[ $basename ] = true;
-//			$fpath     = ltrim( str_replace( $attachment_path, '', $file ), "/" );
-//			$file_data = explode( '/', $fpath );
-//			if ( count( $file_data ) >= 2 ) {
-//				$attachment_data[ $basename ][ $file_data[0] ] = true;
-//			}
 		}
 
 		return (object) $attachment_data;

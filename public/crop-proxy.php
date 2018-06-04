@@ -47,16 +47,13 @@ class Brizy_Public_CropProxy extends Brizy_Public_AbstractProxy {
 		if ( isset( $vars[ self::ENDPOINT ] ) && is_string( $vars[ self::ENDPOINT ] ) && ! empty( $vars[ self::ENDPOINT ] ) ) {
 
 			try {
-				if ( is_numeric( $vars[ self::ENDPOINT ] ) ) {
-					$this->crop_local_asset( (int) $vars[ self::ENDPOINT ], html_entity_decode( $vars[ self::ENDPOINT_FILTER ] ), (int) $vars[ self::ENDPOINT_POST ] );
-				} else {
-					$this->crop_external_asset( $vars[ self::ENDPOINT ], html_entity_decode( $vars[ self::ENDPOINT_FILTER ] ), (int) $vars[ self::ENDPOINT_POST ] );
-				}
-			} catch (Exception $e) {
-				Brizy_Logger::instance()->exception($e);
+				$this->crop_local_asset( $vars[ self::ENDPOINT ], html_entity_decode( $vars[ self::ENDPOINT_FILTER ] ), (int) $vars[ self::ENDPOINT_POST ] );
+			} catch ( Exception $e ) {
+				Brizy_Logger::instance()->exception( $e );
 
 				global $wp_query;
 				$wp_query->set_404();
+
 				return;
 			}
 		}
@@ -64,18 +61,27 @@ class Brizy_Public_CropProxy extends Brizy_Public_AbstractProxy {
 
 
 	/**
-	 * @param int $attachment_id
+	 * @param $attachment_hash
 	 * @param $filter
-	 * @param int $post_id
+	 * @param $post_id
 	 *
 	 * @throws Exception
 	 */
-	private function crop_local_asset( $attachment_id, $filter, $post_id ) {
+	private function crop_local_asset( $attachment_hash, $filter, $post_id ) {
 		try {
 
-			if ( ! wp_attachment_is_image( $attachment_id ) ) {
+			$attachments = get_posts( array(
+				'meta_key'    => 'brizy_attachment_uid',
+				'meta_value'  => $attachment_hash,
+				'post_type'   => 'attachment',
+				'post_status' => 'publish'
+			) );
+
+			if ( count( $attachments ) == 0 ) {
 				return;
 			}
+
+			$attachment_id = $attachments[0]->ID;
 
 			$media_url = get_attached_file( $attachment_id );
 
@@ -91,30 +97,4 @@ class Brizy_Public_CropProxy extends Brizy_Public_AbstractProxy {
 			throw new Exception( 'Unable to crop media' );
 		}
 	}
-
-	/**
-	 * @param $media
-	 * @param $filter
-	 * @param int $post_id
-	 *
-	 * @throws Exception
-	 */
-	private function crop_external_asset( $media, $filter, $post_id ) {
-
-		try {
-			$project    = Brizy_Editor_Project::get();
-			$brizy_post = Brizy_Editor_Post::get( $post_id );
-
-			$media_cache     = new Brizy_Editor_CropCacheMedia( $project, $brizy_post );
-			$original_path   = $media_cache->download_original_image( $media );
-			$crop_media_path = $media_cache->crop_media( $original_path, $filter );
-			$this->send_file( $crop_media_path );
-
-		} catch ( Exception $e ) {
-			Brizy_Logger::instance()->exception( $e );
-			throw new Exception( 'Unable to crop media' );
-		}
-
-	}
-
 }
