@@ -101,15 +101,4 @@ class Brizy_Editor_Asset_MediaAssetProcessor implements Brizy_Editor_Asset_Proce
 
 	}
 
-//	public function process_external_asset_urls( $content ) {
-//		$regex = Brizy_Config::MEDIA_IMAGE_URL_REGEX;
-//		preg_match_all( "/{$regex}/im", $content, $matches );
-//
-//		foreach ( $matches[0] as $asset_url ) {
-//			$new_url = $this->storage->store( $asset_url );
-//			$content = str_replace( $asset_url, $new_url, $content );
-//		}
-//
-//		return $content;
-//	}
 }
