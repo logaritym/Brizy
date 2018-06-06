@@ -161,15 +161,18 @@ class Brizy_Editor_Editor_Editor {
 	private function get_page_attachments() {
 		global $wpdb;
 		$query = $wpdb->prepare(
-		"SELECT p.id,(select meta_value from {$wpdb->prefix}postmeta where meta_key='brizy_attachment_uid' and post_id=p.id) as uid 
-				FROM {$wpdb->prefix}postmeta m
-				JOIN {$wpdb->prefix}posts p ON p.ID=m.post_id and p.post_type='attachment'
-				WHERE m.meta_key='brizy_post_uid' and m.meta_value=%s", $this->post->get_uid() );
+		"SELECT 
+					pm.*
+				FROM 
+					{$wpdb->prefix}postmeta pm 
+				    JOIN {$wpdb->prefix}postmeta pm2 ON pm2.post_id=pm.post_id AND pm2.meta_key='brizy_post_uid' AND pm2.meta_value=%s
+				WHERE pm.meta_key='brizy_attachment_uid'
+				GROUP BY pm.post_id", $this->post->get_uid() );
 
 		$results = $wpdb->get_results( $query  );
 		$attachment_data = array();
 		foreach ( $results as $row ) {
-			$attachment_data[ $row->guid ] = true;
+			$attachment_data[ $row->meta_value ] = true;
 		}
 
 		return (object) $attachment_data;
