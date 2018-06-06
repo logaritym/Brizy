@@ -74,7 +74,6 @@ class Brizy_Public_CropProxy extends Brizy_Public_AbstractProxy {
 				'meta_key'    => 'brizy_attachment_uid',
 				'meta_value'  => $attachment_hash,
 				'post_type'   => 'attachment',
-				'post_status' => 'publish'
 			) );
 
 			if ( count( $attachments ) == 0 ) {
