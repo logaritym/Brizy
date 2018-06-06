@@ -58,12 +58,13 @@ abstract class Brizy_Editor_Asset_StaticFile {
 	 *
 	 * @param $asset_path
 	 * @param $post_id
+	 * @param null $uid
 	 *
 	 * @return bool|int|WP_Error
 	 * @throws Brizy_Editor_Exceptions_NotFound
 	 * @throws Brizy_Editor_Exceptions_UnsupportedPostType
 	 */
-	public function attach_to_post( $asset_path, $post_id) {
+	public function attach_to_post( $asset_path, $post_id, $uid = null ) {
 
 		if ( ! $post_id ) {
 			return false;
@@ -89,7 +90,7 @@ abstract class Brizy_Editor_Asset_StaticFile {
 			return false;
 		}
 
-		update_post_meta( $attachment_id, 'brizy_attachment_uid', md5( $attachment_id . time() ) );
+		update_post_meta( $attachment_id, 'brizy_attachment_uid', $uid ? $uid : md5( $attachment_id . time() ) );
 		update_post_meta( $attachment_id, 'brizy_post_uid', $bpost->get_uid() );
 
 		if ( ! function_exists( 'wp_generate_attachment_metadata' ) ) {
