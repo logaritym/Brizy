@@ -137,6 +137,7 @@ class Brizy_Editor_Editor_Editor {
 					'savePage'         => Brizy_Editor_API::AJAX_SAVE_TRIGGER,
 					'getTerms'         => Brizy_Editor_API::AJAX_GET_TERMS,
 					'downloadMedia'    => Brizy_Editor_API::AJAX_DOWNLOAD_MEDIA,
+					'getMediaUid'      => Brizy_Editor_API::AJAX_MEDIA_METAKEY,
 				),
 				'plugins'         => array(
 					'dummy'       => true,
