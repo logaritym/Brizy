@@ -90,7 +90,6 @@ class Brizy_Editor_Asset_MediaAssetProcessor implements Brizy_Editor_Asset_Proce
 			'meta_key'    => 'brizy_attachment_uid',
 			'meta_value'  => $uid,
 			'post_type'   => 'attachment',
-			'post_status' => 'publish'
 		) );
 
 		if ( count( $attachments ) == 0 ) {
