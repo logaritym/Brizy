@@ -724,13 +724,15 @@ function initForm($component) {
     }
   );
   $component.on("submit", "form", function(event) {
-    var $this = $(this),
-      projectLanguage = $this.attr("data-project-language"),
-      id = $this.attr("data-form-id"),
-      url = $this.attr("action"),
-      successMessage = $this.attr("data-success"),
-      errorMessage = $this.attr("data-error"),
-      redirect = $this.attr("data-redirect");
+    event.preventDefault();
+
+    var $this = $(this);
+    var projectLanguage = $this.attr("data-project-language");
+    var id = $this.attr("data-form-id");
+    var url = $this.attr("action");
+    var successMessage = $this.attr("data-success");
+    var errorMessage = $this.attr("data-error");
+    var redirect = $this.attr("data-redirect");
 
     event.preventDefault();
     clearFormMessages($this);
@@ -791,26 +793,24 @@ function initForm($component) {
 
 function validate() {
   var $this = $(this);
-  var $parrentElem = $this.closest(".brz-form__item");
+  var $parentElem = $this.closest(".brz-form__item");
   var value = $this.val();
   var result = true;
 
-  $parrentElem.removeClass(
+  $parentElem.removeClass(
     "brz-form__item--error brz-form__item--error-pattern brz-form__item--error-required"
   );
 
   var pattern = $this.attr("pattern");
   if (!new RegExp(pattern).test(value)) {
-    $parrentElem.addClass(
-      "brz-form__item--error brz-form__item--error-pattern"
-    );
+    $parentElem.addClass("brz-form__item--error brz-form__item--error-pattern");
     result = false;
   }
 
   var isRequired = $this.prop("required");
   if (isRequired) {
     if (!value.length) {
-      $parrentElem.addClass(
+      $parentElem.addClass(
         "brz-form__item--error brz-form__item--error-required"
       );
       result = false;

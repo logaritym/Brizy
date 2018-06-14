@@ -28,6 +28,11 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 	/**
 	 * @var string
 	 */
+	protected $compiled_html;
+
+	/**
+	 * @var string
+	 */
 	protected $compiled_html_body;
 
 	/**
@@ -205,8 +210,10 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 
 		$compiled_html = Brizy_Editor_User::get()->compile_page( Brizy_Editor_Project::get(), $this );
 
-		$this->set_compiled_html_head( $compiled_html->get_head() );
-		$this->set_compiled_html_body( $compiled_html->get_body() );
+		$this->set_compiled_html( $compiled_html );
+
+		$this->set_compiled_html_head( null );
+		$this->set_compiled_html_body( null );
 
 		$this->set_needs_compile( false );
 
@@ -276,6 +283,24 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
+	public function get_compiled_html() {
+		return $this->compiled_html;
+	}
+
+	/**
+	 * @param string $compiled_html
+	 *
+	 * @return Brizy_Editor_Post
+	 */
+	public function set_compiled_html( $compiled_html ) {
+		$this->compiled_html = $compiled_html;
+
+		return $this;
+	}
+
 	public function get_compiled_html_body() {
 		return $this->compiled_html_body;
 	}
@@ -292,7 +317,7 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 
 	public function set_compiled_html_head( $html ) {
 		// remove all title and meta tags.
-		$this->compiled_html_head = $this->strip_tags_content( $html, '<title>', true );
+		$this->compiled_html_head = $html;
 
 		return $this;
 	}
@@ -431,3 +456,4 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 		return $this;
 	}
 }
+

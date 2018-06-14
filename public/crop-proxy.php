@@ -50,7 +50,7 @@ class Brizy_Public_CropProxy extends Brizy_Public_AbstractProxy {
 				$this->crop_local_asset( $vars[ self::ENDPOINT ], html_entity_decode( $vars[ self::ENDPOINT_FILTER ] ), (int) $vars[ self::ENDPOINT_POST ] );
 			} catch ( Exception $e ) {
 				Brizy_Logger::instance()->exception( $e );
-
+				status_header(404);
 				global $wp_query;
 				$wp_query->set_404();
 
@@ -77,7 +77,7 @@ class Brizy_Public_CropProxy extends Brizy_Public_AbstractProxy {
 			) );
 
 			if ( count( $attachments ) == 0 ) {
-				return;
+				throw new Exception('No post found with such media hash.');
 			}
 
 			$attachment_id = $attachments[0]->ID;
