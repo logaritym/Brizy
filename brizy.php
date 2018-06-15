@@ -14,7 +14,7 @@
 define( 'BRIZY_DEVELOPMENT', false );
 define( 'BRIZY_LOG', false );
 define( 'BRIZY_VERSION', '1.0.15' );
-define( 'BRIZY_EDITOR_VERSION', '1.0.39' );
+define( 'BRIZY_EDITOR_VERSION', '1.0.38' );
 define( 'BRIZY_FILE', __FILE__ );
 define( 'BRIZY_PLUGIN_BASE', plugin_basename( BRIZY_FILE ) );
 define( 'BRIZY_PLUGIN_PATH', dirname( BRIZY_FILE ) );
