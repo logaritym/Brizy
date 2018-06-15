@@ -17,13 +17,13 @@ class Brizy_Config {
 	const LOCAL_PAGE_MEDIA_STATIC_URL = '/brizy/media';
 
 	//const LOCAL_PAGE_ASSET_SPLITTER = "/\/brizy\/pages\/(.[^\/]*)\/(.[^\/]*)/";
-	const LOCAL_PAGE_ASSET_STATIC_URL = '/brizy/pages';
+	const LOCAL_PAGE_ASSET_STATIC_URL = '/brizy/pages/%s';
 	//const BRIZY_WP_PAGE_ASSET_PATH = '/brizy/pages/%s/%s';
 
 
 	//const LOCAL_EDITOR_ASSET_STATIC_URL = '/brizy/editor';
 	//const LOCAL_EDITOR_ASSET_SPLITTER = "/\/brizy\/editor\/(.[^\/]*)\/(.[^\/]*)/";
-	const BRIZY_WP_EDITOR_ASSET_PATH = '/brizy/editor';
+	const BRIZY_WP_EDITOR_ASSET_PATH = '/brizy/editor/%s';
 
 
 	const EDITOR_BASE_URL = 'http://www.testblox.info';

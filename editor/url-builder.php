@@ -39,7 +39,6 @@ class Brizy_Editor_UrlBuilder {
 	public function application_form_url() {
 		return sprintf( Brizy_Config::BRIZY_APPLICATION_FORM_URL, Brizy_Config::BRIZY_APPLICATION_FORM_ID, urlencode( $this->multipass_url() ) );
 	}
-
 	/**
 	 * @param $post
 	 */
@@ -90,49 +89,59 @@ class Brizy_Editor_UrlBuilder {
 		return $this->upload_dir['baseurl'] . $path;
 	}
 
-
 	/**
 	 * This will return the relative path to the upload dir.
 	 * ex: /brizy/pages/3/x.jpg
 	 *
 	 * @param null $path
+	 * @param null $post_id
 	 *
 	 * @return string
 	 */
-	public function page_asset_path( $path = null ) {
+	public function page_asset_path( $path = null, $post_id = null ) {
+
+		if ( is_null( $post_id ) ) {
+			$post_id = $this->post->get_id();
+		}
 
 		if ( $path ) {
 			$path = "/" . ltrim( $path, "/" );
 		}
 
-		return sprintf( Brizy_Config::LOCAL_PAGE_ASSET_STATIC_URL . $path );
+		return sprintf( Brizy_Config::LOCAL_PAGE_ASSET_STATIC_URL . $path, $post_id );
 	}
 
 	/**
 	 * @param null $path
+	 * @param null $post_id
 	 *
 	 * @return string
 	 */
-	public function page_asset_url( $path = null ) {
+	public function page_asset_url( $path = null, $post_id = null ) {
 
-		return $this->upload_url( $this->page_asset_path( $path ) );
+		return $this->upload_url( $this->page_asset_path( $path, $post_id ) );
 	}
 
 	/**
 	 * This will return the relative path to the upload dir.
-	 * ex: /brizy/editor/x.jpg
+	 * ex: /brizy/editor/9.0.3/x.jpg
 	 *
 	 * @param null $path
+	 * @param null $template_version
 	 *
 	 * @return string
 	 */
-	public function editor_asset_path( $path = null ) {
+	public function editor_asset_path( $path = null, $template_version = null ) {
+
+		if ( is_null( $template_version ) ) {
+			$template_version = BRIZY_EDITOR_VERSION;
+		}
 
 		if ( $path ) {
 			$path = "/" . ltrim( $path, "/" );
 		}
 
-		return sprintf( Brizy_Config::BRIZY_WP_EDITOR_ASSET_PATH . $path );
+		return sprintf( Brizy_Config::BRIZY_WP_EDITOR_ASSET_PATH . $path, $template_version );
 	}
 
 	public function editor_asset_url() {
@@ -148,11 +157,6 @@ class Brizy_Editor_UrlBuilder {
 	 * @return string
 	 */
 	public function media_asset_path( $path = null ) {
-
-		if ( $path ) {
-			$path = "/" . ltrim( $path, "/" );
-		}
-
 		return Brizy_Config::LOCAL_PAGE_MEDIA_STATIC_URL . $path;
 	}
 
@@ -162,10 +166,7 @@ class Brizy_Editor_UrlBuilder {
 	 * @return string
 	 */
 	public function external_media_url( $path = null ) {
-
-		if ( $path ) {
-			$path = "/" . ltrim( $path, "/" );
-		}
+		$path = "/" . ltrim( $path, "/" );
 
 		return Brizy_Config::MEDIA_IMAGE_URL . $path;
 	}

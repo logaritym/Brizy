@@ -57,6 +57,7 @@ class Brizy_Editor_Asset_MediaAssetProcessor implements Brizy_Editor_Asset_Proce
 
 			parse_str( $parsed_url['query'], $params );
 
+
 			if ( ! isset( $params[ Brizy_Public_CropProxy::ENDPOINT ] ) ) {
 				continue;
 			}
@@ -75,7 +76,7 @@ class Brizy_Editor_Asset_MediaAssetProcessor implements Brizy_Editor_Asset_Proce
 
 			$crop_media_path = $media_cache->crop_media( $media_path, $params[ Brizy_Public_CropProxy::ENDPOINT_FILTER ] );
 
-			$urlBuilder      = new Brizy_Editor_UrlBuilder( $project );
+			$urlBuilder      = new Brizy_Editor_UrlBuilder( $project, $brizy_post );
 			$local_media_url = str_replace( $urlBuilder->upload_path(), $urlBuilder->upload_url(), $crop_media_path );
 
 			$content = str_replace( $matches[0][ $i ], $local_media_url, $content );

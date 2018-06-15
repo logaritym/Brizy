@@ -34,7 +34,7 @@ class Brizy_Public_Main {
 
 		$this->project     = $project;
 		$this->post        = $post;
-		$this->url_builder = new Brizy_Editor_UrlBuilder( $project );
+		$this->url_builder = new Brizy_Editor_UrlBuilder( $project, $post );
 	}
 
 	public function initialize_wordpress_editor() {
@@ -263,7 +263,7 @@ class Brizy_Public_Main {
 
 		$compiled_page = $this->get_compiled_page();
 
-		$compiled_page->addAssetProcessor( new Brizy_Editor_Asset_StripTagsProcessor( array( '<title>' ) ) );
+		$compiled_page->addAssetProcessor(new Brizy_Editor_Asset_StripTagsProcessor(array('<title>')));
 
 		$head = $compiled_page->get_head();
 
@@ -307,9 +307,9 @@ class Brizy_Public_Main {
 		$media_storage = new Brizy_Editor_Asset_MediaProxyStorage( $this->project, $this->post, $config );
 
 		$asset_processors   = array();
-		$asset_processors[] = new Brizy_Editor_Asset_DomainProcessor();
 		$asset_processors[] = new Brizy_Editor_Asset_AssetProxyProcessor( $asset_storage );
 		$asset_processors[] = new Brizy_Editor_Asset_MediaAssetProcessor( $media_storage );
+		$asset_processors[] = new Brizy_Editor_Asset_DomainProcessor();
 
 		$brizy_editor_compiled_html = new Brizy_Editor_CompiledHtml( $this->post->get_compiled_html() );
 		$brizy_editor_compiled_html->setAssetProcessors( $asset_processors );
