@@ -28,12 +28,6 @@ class Brizy_Editor_UrlBuilder {
 		$this->project    = $project;
 		$this->post       = $post;
 		$this->upload_dir = wp_upload_dir( null, true );
-
-//		if ( $wp_rewrite->permalink_structure == "" ) {
-//			$site_url = get_site_url();
-//			$this->upload_dir['url']     = str_replace( $site_url, $site_url . "/index.php", $this->upload_dir['url'] );
-//			$this->upload_dir['baseurl'] = str_replace( $site_url, $site_url . "/index.php", $this->upload_dir['baseurl'] );
-//		}
 	}
 
 	public function application_form_url() {
@@ -124,24 +118,19 @@ class Brizy_Editor_UrlBuilder {
 
 	/**
 	 * This will return the relative path to the upload dir.
-	 * ex: /brizy/editor/9.0.3/x.jpg
+	 * ex: /brizy/editor/x.jpg
 	 *
 	 * @param null $path
-	 * @param null $template_version
 	 *
 	 * @return string
 	 */
-	public function editor_asset_path( $path = null, $template_version = null ) {
-
-		if ( is_null( $template_version ) ) {
-			$template_version = BRIZY_EDITOR_VERSION;
-		}
+	public function editor_asset_path( $path = null ) {
 
 		if ( $path ) {
 			$path = "/" . ltrim( $path, "/" );
 		}
 
-		return sprintf( Brizy_Config::BRIZY_WP_EDITOR_ASSET_PATH . $path, $template_version );
+		return sprintf( Brizy_Config::BRIZY_WP_EDITOR_ASSET_PATH . $path );
 	}
 
 	public function editor_asset_url() {

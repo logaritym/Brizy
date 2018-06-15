@@ -23,7 +23,7 @@ class Brizy_Config {
 
 	//const LOCAL_EDITOR_ASSET_STATIC_URL = '/brizy/editor';
 	//const LOCAL_EDITOR_ASSET_SPLITTER = "/\/brizy\/editor\/(.[^\/]*)\/(.[^\/]*)/";
-	const BRIZY_WP_EDITOR_ASSET_PATH = '/brizy/editor/%s';
+	const BRIZY_WP_EDITOR_ASSET_PATH = '/brizy/editor';
 
 
 	const EDITOR_BASE_URL = 'http://www.testblox.info';
