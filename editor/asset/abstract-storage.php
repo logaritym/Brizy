@@ -40,7 +40,7 @@ abstract class Brizy_Editor_Asset_AbstractStorage  extends  Brizy_Editor_Asset_S
 		$this->project     = $project;
 		$this->post        = $post;
 		$this->config      = $config;
-		$this->url_builder = new Brizy_Editor_UrlBuilder( $project, $post );
+		$this->url_builder = new Brizy_Editor_UrlBuilder( $project );
 	}
 
 

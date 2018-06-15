@@ -30,7 +30,7 @@ class Brizy_Editor_CropCacheMedia extends Brizy_Editor_Asset_StaticFile {
 	public function __construct( $project, $post ) {
 
 		$this->post        = $post;
-		$this->url_builder = new Brizy_Editor_UrlBuilder( $project, $post );
+		$this->url_builder = new Brizy_Editor_UrlBuilder( $project );
 	}
 
 	/**
