@@ -395,10 +395,10 @@ class Brizy_Admin_Main {
 //		}
 //
 //		$count     = $this->get_brizy_auto_draft_count();
-//		$post_data = [
+//		$post_data = array(
 //			'post_type'  => $post_type,
 //			'post_title' => 'Brizy #' . ( $count + 1 )
-//		];
+//		);
 //
 //		try {
 //			$post_id = wp_insert_post( $post_data );

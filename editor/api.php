@@ -781,9 +781,9 @@ class Brizy_Editor_API {
 			$media_cacher = new Brizy_Editor_CropCacheMedia( $project, $post );
 			$media_cacher->download_original_image( $_REQUEST['media'] );
 
-			wp_send_json( [], 200 );
+			wp_send_json( array(), 200 );
 		} catch ( Exception $e ) {
-			wp_send_json_error( [], 500 );
+			wp_send_json_error( array(), 500 );
 		}
 	}
 
@@ -799,7 +799,7 @@ class Brizy_Editor_API {
 			$uid = get_post_meta( $attachment_id, 'brizy_attachment_uid', true );
 
 			if ( ! $uid ) {
-				$uid = md5( $attachment_id . time() );
+				$uid = "wp-".md5( $attachment_id . time() );
 				update_post_meta( $attachment_id, 'brizy_attachment_uid', $uid );
 			}
 
@@ -820,5 +820,4 @@ class Brizy_Editor_API {
 			return;
 		}
 	}
-
 }
