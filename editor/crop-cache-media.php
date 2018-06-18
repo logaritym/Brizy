@@ -110,9 +110,11 @@ class Brizy_Editor_CropCacheMedia extends Brizy_Editor_Asset_StaticFile {
 
 				if ( $imagine ) {
 					$imagine->save( $resized_image_path );
-
+					unset($imagine);
 					return $resized_image_path;
 				}
+
+
 			}
 		}
 
@@ -124,6 +126,7 @@ class Brizy_Editor_CropCacheMedia extends Brizy_Editor_Asset_StaticFile {
 	 * @param $resize_params
 	 *
 	 * @return \Imagine\Gd\Image|\Imagine\Image\ImageInterface|null|static
+	 * @throws Exception
 	 */
 	private function crop( $original_path, $resize_params ) {
 		$imagine        = $this->getImagine();
@@ -164,14 +167,13 @@ class Brizy_Editor_CropCacheMedia extends Brizy_Editor_Asset_StaticFile {
 			$new_image = $filter->apply( $image );
 		}
 
+
 		return $new_image;
 	}
 
 	private function relativeResize( $image, $imageWidth, $imageHeight ) {
 		$filter = new \Imagine\Filter\Advanced\RelativeResize( "widen", $imageWidth );
-		$image  = $filter->apply( $image );
-
-		return $image;
+		return $filter->apply( $image );
 	}
 
 	private function getImagine() {

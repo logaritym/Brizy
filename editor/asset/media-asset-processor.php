@@ -41,6 +41,9 @@ class Brizy_Editor_Asset_MediaAssetProcessor implements Brizy_Editor_Asset_Proce
 		$site_url = site_url();
 		$site_url = str_replace( array( '/', '.' ), array( '\/', '\.' ), $site_url );
 
+		$project     = Brizy_Editor_Project::get();
+
+
 		preg_match_all( '/' . $site_url . '\/?(\?' . Brizy_Public_CropProxy::ENDPOINT . '=(.[^"\',\s)]*))/im', $content, $matches );
 
 		if ( ! isset( $matches[0] ) || count( $matches[0] ) == 0 ) {
@@ -62,7 +65,7 @@ class Brizy_Editor_Asset_MediaAssetProcessor implements Brizy_Editor_Asset_Proce
 				continue;
 			}
 
-			$project     = Brizy_Editor_Project::get();
+
 			$brizy_post  = Brizy_Editor_Post::get( (int) $params[ Brizy_Public_CropProxy::ENDPOINT_POST ] );
 			$media_cache = new Brizy_Editor_CropCacheMedia( $project, $brizy_post );
 
