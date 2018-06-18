@@ -106,6 +106,9 @@ class Brizy_Editor_CropCacheMedia extends Brizy_Editor_Asset_StaticFile {
 
 				@mkdir( $resized_page_asset_path, 0755, true );
 
+				// Set artificially high because GD uses uncompressed images in memory.
+				wp_raise_memory_limit( 'image' );
+
 				$imagine = $this->crop( $original_asset_path, $media_filter );
 
 				if ( $imagine ) {

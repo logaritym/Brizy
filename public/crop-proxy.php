@@ -47,6 +47,9 @@ class Brizy_Public_CropProxy extends Brizy_Public_AbstractProxy {
 		if ( isset( $vars[ self::ENDPOINT ] ) && is_string( $vars[ self::ENDPOINT ] ) && ! empty( $vars[ self::ENDPOINT ] ) ) {
 
 			try {
+				// Set artificially high because GD uses uncompressed images in memory.
+				wp_raise_memory_limit( 'image' );
+
 				$this->crop_local_asset( $vars[ self::ENDPOINT ], html_entity_decode( $vars[ self::ENDPOINT_FILTER ] ), (int) $vars[ self::ENDPOINT_POST ] );
 			} catch ( Exception $e ) {
 				Brizy_Logger::instance()->exception( $e );
