@@ -52,7 +52,16 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 	 */
 	protected $editor_data;
 
+	/**
+	 * @var string
+	 */
 	protected $uid;
+
+
+	/**
+	 * @var Brizy_Editor_CompiledHtml
+	 */
+	static private $compiled_page;
 
 	/**
 	 * Brizy_Editor_Post constructor.
@@ -228,9 +237,14 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 
 		$this->api_page = null; //$revision_storage['brizy-post']->get_api_page();
 
-		$this->set_compiled_html_head( $revision_storage['brizy-post']->get_compiled_html_head() )
-		     ->set_compiled_html_body( $revision_storage['brizy-post']->get_compiled_html_body() )
-		     ->save();
+		if ( $revision_storage['brizy-post']->get_compiled_html() ) {
+			$this->set_compiled_html( $revision_storage['brizy-post']->get_compiled_html() );
+		} else {
+			$this->set_needs_compile( true )
+			     ->set_compiled_html_head( null )
+			     ->set_compiled_html_body( null );
+		}
+		$this->save();
 	}
 
 	/**
@@ -285,6 +299,28 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 		$this->save();
 
 		return true;
+	}
+
+	public function get_compiled_page( $project ) {
+
+		if ( self::$compiled_page ) {
+			return self::$compiled_page;
+		}
+
+		$brizy_editor_editor_editor = Brizy_Editor_Editor_Editor::get( $project, $this );
+		$config                     = $brizy_editor_editor_editor->config();
+		$asset_storage              = new Brizy_Editor_Asset_AssetProxyStorage( $project, $this, $config );
+		$media_storage              = new Brizy_Editor_Asset_MediaProxyStorage( $project, $this, $config );
+
+		$asset_processors   = array();
+		$asset_processors[] = new Brizy_Editor_Asset_DomainProcessor();
+		$asset_processors[] = new Brizy_Editor_Asset_AssetProxyProcessor( $asset_storage );
+		$asset_processors[] = new Brizy_Editor_Asset_MediaAssetProcessor( $media_storage );
+
+		$brizy_editor_compiled_html = new Brizy_Editor_CompiledHtml( $this->get_compiled_html() );
+		$brizy_editor_compiled_html->setAssetProcessors( $asset_processors );
+
+		return self::$compiled_page = $brizy_editor_compiled_html;
 	}
 
 	public function get_compiler_version() {

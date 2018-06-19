@@ -87,7 +87,6 @@ class Brizy_Editor_API {
 		add_action( 'wp_ajax_' . self::AJAX_GET_MENU_LIST, array( $this, 'get_menu_list' ) );
 		add_action( 'wp_ajax_' . self::AJAX_SAVE_TRIGGER, array( $this, 'save_trigger' ) );
 		add_action( 'wp_ajax_' . self::AJAX_GET_TERMS, array( $this, 'get_terms' ) );
-		add_action( 'wp_ajax_' . self::AJAX_GET_TERMS, array( $this, 'get_terms' ) );
 		add_action( 'wp_ajax_' . self::AJAX_DOWNLOAD_MEDIA, array( $this, 'download_media' ) );
 		add_action( 'wp_ajax_' . self::AJAX_MEDIA_METAKEY, array( $this, 'get_media_key' ) );
 		add_action( 'wp_ajax_' . self::AJAX_JWT_TOKEN, array( $this, 'multipass_create' ) );
@@ -330,7 +329,8 @@ class Brizy_Editor_API {
 			$can_publish      = current_user_can( $post_type_object->cap->publish_posts );
 			$post_status  = $can_publish ?'publish':'pending';
 
-			wp_update_post( array( 'ID' => $post_id, 'post_status' => $post_status , 'post_content' => $post->get_compiled_html_body() ) );
+			$brizy_compiled_page = $post->get_compiled_page(Brizy_Editor_Project::get());
+			wp_update_post( array( 'ID' => $post_id, 'post_status' => $post_status , 'post_content' => $brizy_compiled_page->get_body() ) );
 
 			// get latest version of post
 			$post                 = Brizy_Editor_Post::get( $post_id );

@@ -24,6 +24,8 @@ class Brizy_Public_Main {
 	 */
 	private $url_builder;
 
+
+
 	/**
 	 * Brizy_Public_Main constructor.
 	 *
@@ -261,7 +263,7 @@ class Brizy_Public_Main {
 			return;
 		}
 
-		$compiled_page = $this->get_compiled_page();
+		$compiled_page = $this->post->get_compiled_page($this->project);
 
 		$compiled_page->addAssetProcessor(new Brizy_Editor_Asset_StripTagsProcessor(array('<title>')));
 
@@ -294,29 +296,12 @@ class Brizy_Public_Main {
 			return $content;
 		}
 
-		$compiled_page = $this->get_compiled_page();
+		$compiled_page = $this->post->get_compiled_page($this->project);
 
 		$body = $compiled_page->get_body();
 
 		return $body;
 	}
-
-	private function get_compiled_page() {
-		$config        = Brizy_Editor_Editor_Editor::get( $this->project, $this->post )->config();
-		$asset_storage = new Brizy_Editor_Asset_AssetProxyStorage( $this->project, $this->post, $config );
-		$media_storage = new Brizy_Editor_Asset_MediaProxyStorage( $this->project, $this->post, $config );
-
-		$asset_processors   = array();
-		$asset_processors[] = new Brizy_Editor_Asset_DomainProcessor();
-		$asset_processors[] = new Brizy_Editor_Asset_AssetProxyProcessor( $asset_storage );
-		$asset_processors[] = new Brizy_Editor_Asset_MediaAssetProcessor( $media_storage );
-
-		$brizy_editor_compiled_html = new Brizy_Editor_CompiledHtml( $this->post->get_compiled_html() );
-		$brizy_editor_compiled_html->setAssetProcessors( $asset_processors );
-
-		return $brizy_editor_compiled_html;
-	}
-
 
 	/**
 	 * @param string $rel
