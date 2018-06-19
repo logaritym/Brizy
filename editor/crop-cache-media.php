@@ -180,6 +180,13 @@ class Brizy_Editor_CropCacheMedia extends Brizy_Editor_Asset_StaticFile {
 	}
 
 	private function getImagine() {
+
+		if (extension_loaded('imagick') && class_exists('Imagick'))
+		{
+			return new \Imagine\Imagick\Imagine();
+		}
+
+
 		return new Imagine\Gd\Imagine();
 	}
 
