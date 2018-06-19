@@ -203,7 +203,7 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 		 */
 		$revision_storage = $storage->get_storage();
 
-		if ( !$revision_storage || count( $revision_storage ) == 0 ) {
+		if ( ! $revision_storage || count( $revision_storage ) == 0 ) {
 			return;
 		}
 
@@ -337,20 +337,34 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 		return $this->uid;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function get_uid() {
 		return $this->uid;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function get_editor_data() {
 		return isset( $this->editor_data ) ? $this->editor_data : '';
 	}
 
+	/**
+	 * @param $content
+	 *
+	 * @return $this
+	 */
 	public function set_editor_data( $content ) {
 		$this->editor_data = $content;
 
 		return $this;
 	}
 
+	/**
+	 * @return false|int|mixed
+	 */
 	public function get_parent_id() {
 		$id = wp_is_post_revision( $this->get_id() );
 
@@ -379,20 +393,42 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 		return $this;
 	}
 
+	/**
+	 * @deprecated use get_compiled_html
+	 * @return string
+	 */
 	public function get_compiled_html_body() {
 		return $this->compiled_html_body;
 	}
 
+	/**
+	 * @deprecated use get_compiled_html
+	 * @return string
+	 */
 	public function get_compiled_html_head() {
 		return $this->compiled_html_head;
 	}
 
+	/**
+	 * @deprecated use set_compiled_html
+	 *
+	 * @param $html
+	 *
+	 * @return $this
+	 */
 	public function set_compiled_html_body( $html ) {
 		$this->compiled_html_body = $html;
 
 		return $this;
 	}
 
+	/**
+	 * @deprecated use set_compiled_html
+	 *
+	 * @param $html
+	 *
+	 * @return $this
+	 */
 	public function set_compiled_html_head( $html ) {
 		// remove all title and meta tags.
 		$this->compiled_html_head = $html;
@@ -476,16 +512,31 @@ class Brizy_Editor_Post extends Brizy_Admin_Serializable {
 		);
 	}
 
+	/**
+	 * @param $v
+	 *
+	 * @return $this
+	 */
 	public function set_needs_compile( $v ) {
 		$this->needs_compile = (bool) $v;
 
 		return $this;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function get_needs_compile() {
 		return $this->needs_compile;
 	}
 
+	/**
+	 * @param $text
+	 * @param string $tags
+	 * @param bool $invert
+	 *
+	 * @return null|string|string[]
+	 */
 	function strip_tags_content( $text, $tags = '', $invert = false ) {
 
 		preg_match_all( '/<(.+?)[\s]*\/?[\s]*>/si', trim( $tags ), $tags );
