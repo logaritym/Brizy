@@ -81,17 +81,10 @@ class Brizy_Admin_Main {
 			if ( $parent_id ) {
 				$brizy_post = Brizy_Editor_Post::get( $parent_id );
 
-				$brizy_post->compile_page();
-
 				if ( $brizy_post ) {
 					$brizy_post->save_revision( $post_id );
 				}
-			} else {
-				$brizy_post = Brizy_Editor_Post::get( $post_id );
-				$brizy_post->compile_page();
 			}
-
-			$brizy_post->save();
 
 		} catch ( Exception $e ) {
 			Brizy_Logger::instance()->exception( $e );

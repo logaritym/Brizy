@@ -329,6 +329,10 @@ class Brizy_Editor_API {
 			$can_publish      = current_user_can( $post_type_object->cap->publish_posts );
 			$post_status  = $can_publish ?'publish':'pending';
 
+			// compiliation needs to go here
+
+			$post->compile_page();
+
 			$brizy_compiled_page = $post->get_compiled_page(Brizy_Editor_Project::get());
 			wp_update_post( array( 'ID' => $post_id, 'post_status' => $post_status , 'post_content' => $brizy_compiled_page->get_body() ) );
 
